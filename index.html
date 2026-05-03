@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Playted Supper Club · Seattle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ember:    #2C2416;
+    --dark:     #3B1F0E;
+    --terra:    #C4622D;
+    --palm:     #E8C99A;
+    --linen:    #F5EFE4;
+    --gray:     #888780;
+    --border:   rgba(196,98,45,0.2);
+    --serif:    'Cormorant Garamond', Georgia, serif;
+    --sans:     'Jost', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--ember);
+    color: var(--linen);
+    font-family: var(--serif);
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 0.5px solid transparent;
+    transition: all 0.4s ease;
+  }
+  nav.scrolled {
+    background: rgba(44,36,22,0.95);
+    border-color: var(--border);
+    backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none;
+  }
+  .nav-wordmark {
+    font-family: var(--serif);
+    font-size: 18px; font-weight: 400; letter-spacing: 0.08em;
+    color: var(--linen);
+  }
+  .nav-wordmark .y { color: var(--terra); }
+  .nav-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--sans); font-size: 11px; font-weight: 400;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gray); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--linen); }
+  .nav-cta {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--linen); background: var(--terra);
+    border: none; padding: 10px 24px; cursor: pointer;
+    text-decoration: none; transition: opacity 0.2s;
+  }
+  .nav-cta:hover { opacity: 0.85; }
+
+  /* ── HERO ── */
+  #hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 120px 48px 80px;
+    position: relative; text-align: center;
+  }
+
+  /* step-and-repeat background */
+  #hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='56'%3E%3Ccircle cx='18' cy='30' r='14' fill='%233B1F0E' opacity='0.5'/%3E%3Ccircle cx='18' cy='30' r='9' fill='none' stroke='%234A2812' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='46' cy='30' r='14' fill='%233B1F0E' opacity='0.5'/%3E%3Ccircle cx='46' cy='30' r='9' fill='none' stroke='%234A2812' stroke-width='1' opacity='0.5'/%3E%3Ccircle cx='32' cy='14' r='14' fill='%237A3418' opacity='0.5'/%3E%3Ccircle cx='32' cy='14' r='9' fill='none' stroke='%238F3E1C' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.18; pointer-events: none; z-index: 0;
+  }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-edition {
+    font-family: var(--sans); font-size: 10px; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--terra); margin-bottom: 40px;
+    opacity: 0; animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-icon {
+    margin: 0 auto 40px;
+    opacity: 0; animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-title {
+    font-size: clamp(64px, 10vw, 120px);
+    font-weight: 300; letter-spacing: 0.06em;
+    line-height: 0.9; margin-bottom: 8px;
+    opacity: 0; animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+  .hero-title .y { color: var(--terra); }
+
+  .hero-sub {
+    font-family: var(--sans); font-size: 11px; font-weight: 300;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gray); margin-bottom: 40px;
+    opacity: 0; animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .hero-rule {
+    width: 200px; height: 0.5px;
+    background: linear-gradient(to right, transparent, var(--terra), transparent);
+    margin: 0 auto 40px;
+    opacity: 0; animation: fadeIn 0.8s ease 1s forwards;
+  }
+
+  .hero-tagline {
+    font-size: clamp(18px, 3vw, 26px);
+    font-weight: 300; font-style: italic;
+    color: var(--palm); line-height: 1.6; max-width: 540px;
+    opacity: 0; animation: fadeUp 0.8s ease 1.1s forwards;
+  }
+
+  .hero-scroll {
+    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
+    font-family: var(--sans); font-size: 9px; font-weight: 300;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--gray);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    opacity: 0; animation: fadeIn 1s ease 1.6s forwards;
+  }
+  .hero-scroll::after {
+    content: '';
+    width: 0.5px; height: 40px;
+    background: linear-gradient(to bottom, var(--terra), transparent);
+    animation: scrollLine 2s ease-in-out infinite;
+  }
+
+  /* ── SECTION BASE ── */
+  section {
+    padding: 100px 48px;
+    position: relative;
+    border-top: 0.5px solid var(--border);
+  }
+  .section-inner { max-width: 960px; margin: 0 auto; }
+
+  .section-label {
+    font-family: var(--sans); font-size: 10px; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--terra); margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(32px, 5vw, 56px);
+    font-weight: 300; letter-spacing: 0.04em;
+    margin-bottom: 32px; line-height: 1.1;
+  }
+  .section-body {
+    font-size: 18px; font-weight: 300; line-height: 1.8;
+    color: var(--palm); max-width: 620px;
+  }
+
+  /* ── EVENT ── */
+  #event .event-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px; margin-top: 60px;
+  }
+  .event-cell {
+    background: rgba(59,31,14,0.3);
+    border: 0.5px solid var(--border);
+    padding: 40px;
+  }
+  .event-cell .ec-label {
+    font-family: var(--sans); font-size: 9px; font-weight: 400;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--gray); margin-bottom: 12px;
+  }
+  .event-cell .ec-value {
+    font-size: clamp(24px, 4vw, 42px);
+    font-weight: 300; color: var(--linen); line-height: 1;
+  }
+  .event-cell .ec-sub {
+    font-family: var(--sans); font-size: 11px; font-weight: 300;
+    color: var(--gray); margin-top: 8px; letter-spacing: 0.06em;
+  }
+  .event-cell.terra { background: var(--terra); border-color: var(--terra); }
+  .event-cell.terra .ec-label { color: rgba(245,239,228,0.6); }
+  .event-cell.terra .ec-value { color: var(--linen); }
+
+  .includes-row {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; margin-top: 2px;
+  }
+  .include-item {
+    background: rgba(59,31,14,0.2);
+    border: 0.5px solid var(--border);
+    padding: 28px 32px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .include-icon {
+    width: 36px; height: 36px; flex-shrink: 0;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .include-text .it-title {
+    font-family: var(--sans); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--linen);
+    margin-bottom: 3px;
+  }
+  .include-text .it-sub {
+    font-family: var(--sans); font-size: 11px; font-weight: 300;
+    color: var(--gray);
+  }
+
+  /* ── RSVP ── */
+  #rsvp { background: rgba(59,31,14,0.15); }
+
+  .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; margin-top: 40px;
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+
+  .form-group { display: flex; flex-direction: column; gap: 8px; }
+  .form-group label {
+    font-family: var(--sans); font-size: 9px; font-weight: 400;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--gray);
+  }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: rgba(44,36,22,0.6);
+    border: 0.5px solid var(--border);
+    color: var(--linen); font-family: var(--serif); font-size: 16px;
+    padding: 14px 18px; outline: none;
+    transition: border-color 0.2s;
+    appearance: none; -webkit-appearance: none;
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: var(--gray); font-style: italic; }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: var(--terra); }
+  .form-group select option { background: var(--ember); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+
+  .form-checkbox {
+    display: flex; align-items: flex-start; gap: 12px;
+    margin-top: 8px;
+  }
+  .form-checkbox input[type="checkbox"] {
+    width: 16px; height: 16px; flex-shrink: 0; margin-top: 3px;
+    accent-color: var(--terra);
+    background: transparent; border: 0.5px solid var(--terra);
+  }
+  .form-checkbox label {
+    font-family: var(--sans); font-size: 12px; font-weight: 300;
+    color: var(--gray); line-height: 1.6; letter-spacing: 0.02em;
+    text-transform: none;
+  }
+  .form-checkbox label a { color: var(--terra); text-decoration: none; }
+
+  .btn-primary {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--linen); background: var(--terra);
+    border: none; padding: 18px 48px; cursor: pointer;
+    transition: opacity 0.2s; margin-top: 16px;
+    width: 100%;
+  }
+  .btn-primary:hover { opacity: 0.85; }
+
+  .form-note {
+    font-family: var(--sans); font-size: 11px; font-weight: 300;
+    color: var(--gray); margin-top: 12px; text-align: center;
+    letter-spacing: 0.04em; font-style: italic;
+  }
+
+  /* ── TICKETS ── */
+  #tickets .ticket-card {
+    background: rgba(59,31,14,0.3);
+    border: 0.5px solid var(--border);
+    padding: 48px; margin-top: 48px;
+    display: grid; grid-template-columns: 1fr auto;
+    gap: 48px; align-items: center;
+  }
+  .ticket-info .ti-event {
+    font-family: var(--sans); font-size: 10px; font-weight: 400;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--terra); margin-bottom: 12px;
+  }
+  .ticket-info .ti-name {
+    font-size: 36px; font-weight: 300; margin-bottom: 8px;
+  }
+  .ticket-info .ti-details {
+    font-family: var(--sans); font-size: 12px; font-weight: 300;
+    color: var(--gray); letter-spacing: 0.06em; line-height: 1.8;
+  }
+  .ticket-price-block { text-align: right; flex-shrink: 0; }
+  .ticket-price-block .price {
+    font-size: 72px; font-weight: 300; color: var(--terra);
+    line-height: 1; display: block;
+  }
+  .ticket-price-block .per {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--gray); margin-bottom: 16px; display: block;
+  }
+  .btn-ticket {
+    font-family: var(--sans); font-size: 11px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--linen); background: transparent;
+    border: 0.5px solid var(--terra); padding: 14px 28px;
+    cursor: pointer; transition: all 0.2s; display: block;
+    width: 100%; text-align: center; text-decoration: none;
+  }
+  .btn-ticket:hover { background: var(--terra); }
+  .ticket-note {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    color: var(--gray); text-align: center; margin-top: 8px;
+    font-style: italic; letter-spacing: 0.04em;
+  }
+
+  /* ── NEWSLETTER ── */
+  #newsletter {
+    background: var(--dark);
+    text-align: center;
+  }
+  .newsletter-form {
+    display: flex; gap: 0; max-width: 500px; margin: 40px auto 0;
+  }
+  .newsletter-form input {
+    flex: 1;
+    background: rgba(44,36,22,0.8);
+    border: 0.5px solid var(--border);
+    border-right: none;
+    color: var(--linen); font-family: var(--serif); font-size: 16px;
+    padding: 16px 20px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .newsletter-form input::placeholder { color: var(--gray); font-style: italic; }
+  .newsletter-form input:focus { border-color: var(--terra); }
+  .newsletter-form button {
+    font-family: var(--sans); font-size: 10px; font-weight: 500;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--linen); background: var(--terra);
+    border: none; padding: 16px 28px; cursor: pointer;
+    transition: opacity 0.2s; white-space: nowrap;
+  }
+  .newsletter-form button:hover { opacity: 0.85; }
+  .newsletter-note {
+    font-family: var(--sans); font-size: 11px; font-weight: 300;
+    color: var(--gray); margin-top: 16px; font-style: italic;
+  }
+
+  /* ── ABOUT ── */
+  #about .about-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; align-items: start; margin-top: 60px;
+  }
+  .about-quote {
+    border-left: 1px solid var(--terra);
+    padding-left: 32px;
+  }
+  .about-quote blockquote {
+    font-size: clamp(18px, 2.5vw, 24px);
+    font-weight: 300; font-style: italic;
+    color: var(--palm); line-height: 1.7; margin-bottom: 16px;
+  }
+  .about-quote cite {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    letter-spacing: 0.1em; color: var(--gray);
+    text-transform: uppercase; font-style: normal;
+  }
+  .about-text p {
+    font-size: 16px; font-weight: 300; line-height: 1.9;
+    color: var(--palm); margin-bottom: 20px;
+  }
+  .about-founders {
+    display: flex; gap: 32px; margin-top: 32px;
+  }
+  .founder {
+    flex: 1;
+    border-top: 0.5px solid var(--border);
+    padding-top: 16px;
+  }
+  .founder .f-name {
+    font-size: 18px; font-weight: 400; color: var(--linen);
+    margin-bottom: 4px;
+  }
+  .founder .f-role {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--terra);
+  }
+
+  /* ── CONTACT ── */
+  #contact { background: rgba(59,31,14,0.15); }
+  .contact-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 80px; margin-top: 60px;
+  }
+  .contact-info .ci-item {
+    margin-bottom: 32px;
+  }
+  .contact-info .ci-label {
+    font-family: var(--sans); font-size: 9px; font-weight: 400;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--terra); margin-bottom: 8px;
+  }
+  .contact-info .ci-value {
+    font-size: 18px; font-weight: 300; color: var(--palm);
+    line-height: 1.5;
+  }
+  .contact-info .ci-value a {
+    color: var(--palm); text-decoration: none;
+    border-bottom: 0.5px solid var(--border);
+    transition: border-color 0.2s;
+  }
+  .contact-info .ci-value a:hover { border-color: var(--terra); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 40px 48px;
+    border-top: 0.5px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo {
+    font-family: var(--serif); font-size: 16px; font-weight: 300;
+    letter-spacing: 0.08em; color: var(--linen);
+  }
+  .footer-logo .y { color: var(--terra); }
+  .footer-links {
+    display: flex; gap: 24px; list-style: none;
+  }
+  .footer-links a {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--gray); text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--linen); }
+  .footer-copy {
+    font-family: var(--sans); font-size: 10px; font-weight: 300;
+    letter-spacing: 0.08em; color: var(--gray);
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes scrollLine {
+    0%, 100% { transform: scaleY(1); opacity: 1; }
+    50% { transform: scaleY(0.6); opacity: 0.4; }
+  }
+
+  .reveal {
+    opacity: 0; transform: translateY(24px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── SUCCESS STATES ── */
+  .success-msg {
+    display: none; text-align: center; padding: 20px;
+    font-family: var(--sans); font-size: 13px; font-weight: 300;
+    color: var(--palm); letter-spacing: 0.06em;
+    border: 0.5px solid var(--border); margin-top: 16px;
+    font-style: italic;
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 72px 24px; }
+    #hero { padding: 100px 24px 60px; }
+    .event-grid { grid-template-columns: 1fr; }
+    .includes-row { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .ticket-card { grid-template-columns: 1fr; text-align: center; }
+    .ticket-price-block { text-align: center; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+    .about-founders { flex-direction: column; gap: 20px; }
+    footer { flex-direction: column; gap: 20px; text-align: center; }
+    .newsletter-form { flex-direction: column; }
+    .newsletter-form input { border-right: 0.5px solid var(--border); border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-logo">
+    <svg width="32" height="32" viewBox="0 0 64 64">
+      <circle cx="22" cy="40" r="13" fill="#3B1F0E"/>
+      <circle cx="22" cy="40" r="9" fill="none" stroke="#5C3A22" stroke-width="1.5"/>
+      <circle cx="42" cy="40" r="13" fill="#3B1F0E"/>
+      <circle cx="42" cy="40" r="9" fill="none" stroke="#5C3A22" stroke-width="1.5"/>
+      <circle cx="32" cy="22" r="13" fill="#C4622D"/>
+      <circle cx="32" cy="22" r="9" fill="none" stroke="#E8835A" stroke-width="1.5"/>
+    </svg>
+    <span class="nav-wordmark">PLA<span class="y">Y</span>TED</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#event">Event</a></li>
+    <li><a href="#rsvp">RSVP</a></li>
+    <li><a href="#tickets">Tickets</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#rsvp" class="nav-cta">Sign up</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-content">
+    <p class="hero-edition">Playted Supper Club · Edition No. 01</p>
+
+    <div class="hero-icon">
+      <svg width="120" height="120" viewBox="0 0 120 120">
+        <circle cx="44" cy="76" r="32" fill="#3B1F0E"/>
+        <circle cx="44" cy="76" r="22" fill="none" stroke="#5C3A22" stroke-width="2"/>
+        <circle cx="44" cy="76" r="12" fill="none" stroke="#5C3A22" stroke-width="1"/>
+        <circle cx="76" cy="76" r="32" fill="#3B1F0E"/>
+        <circle cx="76" cy="76" r="22" fill="none" stroke="#5C3A22" stroke-width="2"/>
+        <circle cx="76" cy="76" r="12" fill="none" stroke="#5C3A22" stroke-width="1"/>
+        <circle cx="60" cy="42" r="32" fill="#C4622D"/>
+        <circle cx="60" cy="42" r="22" fill="none" stroke="#E8835A" stroke-width="2"/>
+        <circle cx="60" cy="42" r="12" fill="none" stroke="#E8835A" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <h1 class="hero-title">PLA<span class="y">Y</span>TED</h1>
+    <p class="hero-sub">Supper Club · Seattle · Est. 2026</p>
+    <div class="hero-rule"></div>
+    <p class="hero-tagline">We do not gather for the food alone.<br>We gather for each other.</p>
+  </div>
+  <div class="hero-scroll">Scroll</div>
+</section>
+
+<!-- EVENT -->
+<section id="event">
+  <div class="section-inner">
+    <p class="section-label reveal">First event</p>
+    <h2 class="section-title reveal">The Playted Cookout</h2>
+    <p class="section-body reveal">West African and Caribbean flavours, grilled over open fire. Live music. Curated games. A private outdoor space in Seattle. The first time Playted opens its doors.</p>
+
+    <div class="event-grid reveal">
+      <div class="event-cell">
+        <p class="ec-label">Date</p>
+        <p class="ec-value">May 23</p>
+        <p class="ec-sub">2026</p>
+      </div>
+      <div class="event-cell terra">
+        <p class="ec-label">Time</p>
+        <p class="ec-value">4 — 8 PM</p>
+        <p class="ec-sub">Evening</p>
+      </div>
+      <div class="event-cell">
+        <p class="ec-label">Location</p>
+        <p class="ec-value">Private</p>
+        <p class="ec-sub">Seattle, WA · Disclosed upon invitation</p>
+      </div>
+      <div class="event-cell">
+        <p class="ec-label">Age</p>
+        <p class="ec-value">21+</p>
+        <p class="ec-sub">Valid ID required at entry</p>
+      </div>
+    </div>
+
+    <div class="includes-row reveal">
+      <div class="include-item">
+        <div class="include-icon" style="border: 0.5px solid var(--terra);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4622D" stroke-width="1.5">
+            <path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+        </div>
+        <div class="include-text">
+          <p class="it-title">Food</p>
+          <p class="it-sub">West African & Caribbean</p>
+        </div>
+      </div>
+      <div class="include-item">
+        <div class="include-icon" style="border: 0.5px solid var(--terra);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4622D" stroke-width="1.5">
+            <path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>
+          </svg>
+        </div>
+        <div class="include-text">
+          <p class="it-title">Music</p>
+          <p class="it-sub">Live DJ & performances</p>
+        </div>
+      </div>
+      <div class="include-item">
+        <div class="include-icon" style="border: 0.5px solid var(--terra);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C4622D" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+        </div>
+        <div class="include-text">
+          <p class="it-title">Games</p>
+          <p class="it-sub">Curated outdoor activities</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RSVP -->
+<section id="rsvp">
+  <div class="section-inner">
+    <p class="section-label reveal">Reserve your place</p>
+    <h2 class="section-title reveal">Request an Invitation</h2>
+    <p class="section-body reveal">Playted is by invitation only. Submit your details below and we'll be in touch with access to purchase your ticket.</p>
+
+    <form class="form-grid reveal" id="rsvp-form" onsubmit="handleRSVP(event)">
+      <div class="form-group">
+        <label>First name</label>
+        <input type="text" placeholder="Ikenna" required/>
+      </div>
+      <div class="form-group">
+        <label>Last name</label>
+        <input type="text" placeholder="Joe-Nweke" required/>
+      </div>
+      <div class="form-group">
+        <label>Email address</label>
+        <input type="email" placeholder="your@email.com" required/>
+      </div>
+      <div class="form-group">
+        <label>Instagram handle</label>
+        <input type="text" placeholder="@playted.co"/>
+      </div>
+      <div class="form-group full">
+        <label>Which event are you interested in?</label>
+        <select required>
+          <option value="" disabled selected>Select an event</option>
+          <option>The Playted Cookout — May 23, 2026</option>
+          <option>The Supper Series — Coming Soon</option>
+          <option>The Playted Omakase — Coming Soon</option>
+          <option>The Diaspora Dinner — Coming Soon</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>How did you hear about Playted?</label>
+        <input type="text" placeholder="A friend, Instagram, word of mouth..."/>
+      </div>
+      <div class="form-group full">
+        <div class="form-checkbox">
+          <input type="checkbox" id="newsletter-opt" checked/>
+          <label for="newsletter-opt">Also subscribe me to the Playted newsletter — event announcements, behind the scenes, and early access.</label>
+        </div>
+      </div>
+      <div class="full">
+        <button type="submit" class="btn-primary">Submit invitation request</button>
+        <p class="form-note">We review all requests personally. You'll hear from us within 48 hours.</p>
+        <div class="success-msg" id="rsvp-success">
+          Your request has been received. We'll be in touch within 48 hours. — Playted
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- TICKETS -->
+<section id="tickets">
+  <div class="section-inner">
+    <p class="section-label reveal">Secure your seat</p>
+    <h2 class="section-title reveal">Tickets</h2>
+    <p class="section-body reveal">Tickets are available exclusively to those who have received an invitation. Once approved, you'll receive a private link to complete your purchase.</p>
+
+    <div class="ticket-card reveal">
+      <div class="ticket-info">
+        <p class="ti-event">The Playted Cookout · May 23, 2026</p>
+        <p class="ti-name">General Admission</p>
+        <div class="ti-details">
+          Seattle, WA · Private location<br>
+          4 PM — 8 PM · 21 & Over<br>
+          Includes food, music & games
+        </div>
+      </div>
+      <div class="ticket-price-block">
+        <span class="price">$20</span>
+        <span class="per">per person</span>
+        <a href="#rsvp" class="btn-ticket">Request invitation first</a>
+        <p class="ticket-note">Ticket link sent upon approval</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWSLETTER -->
+<section id="newsletter">
+  <div class="section-inner">
+    <p class="section-label reveal" style="text-align:center;">Stay in the loop</p>
+    <h2 class="section-title reveal" style="text-align:center;">The Playted Letter</h2>
+    <p class="section-body reveal" style="margin: 0 auto; text-align:center;">Event announcements, behind the scenes with Chef Ikenna, early access, and the occasional recipe. No noise — only things worth reading.</p>
+
+    <form class="newsletter-form reveal" id="nl-form" onsubmit="handleNewsletter(event)">
+      <input type="email" placeholder="Your email address" required/>
+      <button type="submit">Subscribe</button>
+    </form>
+    <p class="newsletter-note reveal">No spam. Unsubscribe anytime. We take your inbox seriously.</p>
+    <div class="success-msg reveal" id="nl-success" style="max-width:500px;margin:16px auto 0;">
+      You're on the list. Welcome to Playted.
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <p class="section-label reveal">The story</p>
+    <h2 class="section-title reveal">Why we gather</h2>
+
+    <div class="about-grid reveal">
+      <div class="about-quote">
+        <blockquote>
+          "A man who calls his kinsmen to a feast does not do so to save them from starving. They all have food in their own homes. When we gather together in the moonlit village ground it is not because of the moon. Every man can see it in his own compound. We come together because it is good for kinsmen to do so."
+        </blockquote>
+        <cite>— Chinua Achebe, Things Fall Apart</cite>
+      </div>
+
+      <div class="about-text">
+        <p>Playted Supper Club is a Seattle-based communal dining experience drawn from the bold flavors of West Africa and the Caribbean, shaped by the precision of Asian and European culinary traditions.</p>
+        <p>The name carries a quiet secret. The Y is for you. We do not gather for the food alone. We gather for each other.</p>
+
+        <div class="about-founders">
+          <div class="founder">
+            <p class="f-name">Chef Ikenna Joe-Nweke</p>
+            <p class="f-role">Chef & Co-founder</p>
+          </div>
+          <div class="founder">
+            <p class="f-name">Tiwa Matthew Ogunsanya</p>
+            <p class="f-role">Creative & Co-founder</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-inner">
+    <p class="section-label reveal">Get in touch</p>
+    <h2 class="section-title reveal">Contact</h2>
+
+    <div class="contact-grid reveal">
+      <div class="contact-info">
+        <div class="ci-item">
+          <p class="ci-label">General enquiries</p>
+          <p class="ci-value"><a href="mailto:hello@playted.co">hello@playted.co</a></p>
+        </div>
+        <div class="ci-item">
+          <p class="ci-label">Partnerships & press</p>
+          <p class="ci-value"><a href="mailto:partners@playted.co">partners@playted.co</a></p>
+        </div>
+        <div class="ci-item">
+          <p class="ci-label">Instagram</p>
+          <p class="ci-value"><a href="https://instagram.com/playted.co" target="_blank">@playted.co</a></p>
+        </div>
+        <div class="ci-item">
+          <p class="ci-label">TikTok</p>
+          <p class="ci-value"><a href="https://tiktok.com/@playted.co" target="_blank">@playted.co</a></p>
+        </div>
+        <div class="ci-item">
+          <p class="ci-label">Location</p>
+          <p class="ci-value">Seattle, WA</p>
+        </div>
+      </div>
+
+      <form id="contact-form" onsubmit="handleContact(event)">
+        <div class="form-grid" style="margin-top:0;">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" placeholder="Your name" required/>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="your@email.com" required/>
+          </div>
+          <div class="form-group full">
+            <label>Subject</label>
+            <select>
+              <option value="" disabled selected>Select a subject</option>
+              <option>General enquiry</option>
+              <option>Partnership opportunity</option>
+              <option>Press & media</option>
+              <option>Venue collaboration</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Message</label>
+            <textarea placeholder="Tell us what's on your mind..." required></textarea>
+          </div>
+          <div class="full">
+            <button type="submit" class="btn-primary">Send message</button>
+            <div class="success-msg" id="contact-success">
+              Message received. We'll be in touch soon. — Playted
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">PLA<span class="y">Y</span>TED · Supper Club</div>
+  <ul class="footer-links">
+    <li><a href="#event">Event</a></li>
+    <li><a href="#rsvp">RSVP</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 Playted Supper Club · Seattle</p>
+</footer>
+
+<script>
+  // ── NAV SCROLL ──
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // ── REVEAL ON SCROLL ──
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+
+  // ── FORM HANDLERS ──
+  function handleRSVP(e) {
+    e.preventDefault();
+    document.getElementById('rsvp-success').style.display = 'block';
+    e.target.reset();
+    e.target.querySelector('.btn-primary').textContent = 'Request submitted ✓';
+    e.target.querySelector('.btn-primary').style.background = '#3B1F0E';
+  }
+
+  function handleNewsletter(e) {
+    e.preventDefault();
+    document.getElementById('nl-success').style.display = 'block';
+    e.target.reset();
+    e.target.querySelector('button').textContent = 'Subscribed ✓';
+  }
+
+  function handleContact(e) {
+    e.preventDefault();
+    document.getElementById('contact-success').style.display = 'block';
+    e.target.reset();
+    e.target.querySelector('.btn-primary').textContent = 'Sent ✓';
+    e.target.querySelector('.btn-primary').style.background = '#3B1F0E';
+  }
+</script>
+</body>
+</html>
